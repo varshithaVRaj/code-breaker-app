@@ -47,20 +47,16 @@ struct MatchMarkers: View {
     
     
     @ViewBuilder
-    func matchMarker(peg: Int) -> some View {
+    func matchMarker(peg: Int) -> some View { 
         
         //MARK: we are going to have 2 variables
         // 1) Exact:- How many mathces are exact
         // 2) Found Match:- Matches other than exact match
         // By this we are checking 2 conditions (is it found and is it not found)
         
-        let exactCount: Int = matches.count( where: { match in
-            match == .exact }
-        )
+        let exactCount: Int = matches.count { $0 == .exact }
         
-        let foundMatch: Int = matches.count(where: { match in
-            match != .nomatch
-        })
+        let foundMatch: Int = matches.count { $0 != .nomatch }
         
         
         //The inner fill visualizes the count of .exact.
@@ -71,6 +67,7 @@ struct MatchMarkers: View {
             .fill(exactCount > peg ? Color.primary : Color.clear)
             .strokeBorder(foundMatch > peg ? Color.primary : Color.clear, lineWidth: 2).aspectRatio(1, contentMode: .fit)
     }
+    
     
 }
 
