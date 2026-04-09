@@ -11,6 +11,7 @@ struct ContentView: View {
     
     
     var body: some View {
+        
         VStack {
             pegs(colors: [.red, .green, .green, .yellow])
             pegs(colors: [.red, .blue, .green, .red])
