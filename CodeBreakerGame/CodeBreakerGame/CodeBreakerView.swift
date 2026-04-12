@@ -27,6 +27,8 @@ struct CodeBreakerView: View {
                     .aspectRatio(1, contentMode: .fit)
                     .foregroundStyle(code.pegs[index])
             }
+            
+            MatchMarkers(matches: [.exact, .inexact, .nomatch, .exact])
         }
         
     }
