@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct CodeBreakerView: View {
     
     
     var body: some View {
@@ -40,5 +40,5 @@ struct ContentView: View {
 
 
 #Preview {
-    ContentView()
+    CodeBreakerView()
 }

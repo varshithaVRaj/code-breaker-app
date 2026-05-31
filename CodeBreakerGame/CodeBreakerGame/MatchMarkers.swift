@@ -75,3 +75,5 @@ struct MatchMarkers: View {
 #Preview {
     MatchMarkers(matches: [.nomatch, .exact, .nomatch, .inexact ])
 }
+
+
