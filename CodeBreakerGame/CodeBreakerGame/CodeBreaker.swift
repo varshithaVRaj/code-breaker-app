@@ -17,6 +17,21 @@ struct CodeBreaker {
     var attempts: [Code] = [Code]()
     var pegChoices: [Peg] = [.red, .green, .blue, .yellow]
     
+    init(pegChoices: [Peg] = [.brown, .yellow, .orange, .black]) {
+        self.pegChoices = pegChoices
+        masterCode.randomize(from: pegChoices)
+    }
+    
+    
+   // Take the current guess.
+   // Convert it into a historical attempt.
+   // Save it in the list of attempts.
+    mutating func attemtGuess(){
+        var attempt = guess
+        attempt.kind = .attempt(guess.match(against: masterCode))
+        attempts.append(attempt)
+    }
+    
     
    // When the user taps a peg in their guess, change that peg to the next available color
     mutating func changeGuessPeg(at index: Int){
@@ -29,16 +44,6 @@ struct CodeBreaker {
         }
     }
     
-    
-    // Take the current guess.
-    // Convert it into a historical attempt.
-   // Save it in the list of attempts.
-    mutating func attemtGuess(){
-        var attempt = guess
-        attempt.kind = .attempt(guess.match(against: masterCode))
-        attempts.append(attempt)
-    }
-    
 }
 
 
@@ -47,7 +52,7 @@ struct CodeBreaker {
 struct Code {
     
     var kind: Code.Kind
-    var pegs: [Peg] = [.green, .red, .red, .yellow]
+    var pegs: [Peg] = Array(repeating: Code.missing, count: 4)
     
     static let missing: Peg = .clear
     
@@ -62,6 +67,12 @@ struct Code {
         case attempt([Match])
     
         case unknown
+    }
+    
+    mutating func randomize(from pegChoice: [Peg]){
+        for index in pegChoice.indices {
+            pegs[index] = pegChoice.randomElement() ?? Code.missing
+        }
     }
     
     var matches: [Match] {
