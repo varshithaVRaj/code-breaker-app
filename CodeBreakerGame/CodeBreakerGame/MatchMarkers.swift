@@ -16,6 +16,8 @@ enum Match {
     
 }
 
+
+//MARK: This MatchMarker is our evaluation to the code guessed by the user 
 struct MatchMarkers: View {
     
     // We need to target this match !, this is what we need to match
