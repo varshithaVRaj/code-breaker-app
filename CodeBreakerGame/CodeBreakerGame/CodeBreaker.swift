@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+extension Peg {
+   static let missing = Color.clear
+}
+
 typealias Peg = Color
 
 // Serves the core logic for the game
@@ -40,7 +44,7 @@ struct CodeBreaker {
             let newPeg = pegChoices[(indexOfExistingPegInPegChoices + 1) % pegChoices.count]
             guess.pegs[index] = newPeg
         } else {
-            guess.pegs[index] = pegChoices.first ?? Code.missing
+            guess.pegs[index] = pegChoices.first ?? Code.missingPeg
         }
     }
     
@@ -52,9 +56,9 @@ struct CodeBreaker {
 struct Code {
     
     var kind: Code.Kind
-    var pegs: [Peg] = Array(repeating: Code.missing, count: 4)
+    var pegs: [Peg] = Array(repeating: Code.missingPeg, count: 4)
     
-    static let missing: Peg = .clear
+    static let missingPeg: Peg = .clear
     
     
     //code can be of different types
@@ -71,67 +75,49 @@ struct Code {
     
     mutating func randomize(from pegChoice: [Peg]){
         for index in pegChoice.indices {
-            pegs[index] = pegChoice.randomElement() ?? Code.missing
+            pegs[index] = pegChoice.randomElement() ?? Code.missingPeg
         }
     }
     
-    var matches: [Match] {
+    var matches: [Match]? {
         switch kind {
         case .attempt(let matches):
             return matches
             
-        default: return []
+        default: return nil
             
         }
     }
     
     // Compares this code against another code and returns the match result
     func match(against otherCode: Code) -> [Match] {
-
-        // Start by assuming every peg is a non-match
-        var results: [Match] = Array(repeating: .nomatch, count: pegs.count)
-
-        // Create a working copy of the other code's pegs.
-        // We'll remove matched pegs as we find them to avoid counting them twice.
+        
         var pegsToMatch = otherCode.pegs
-
-        // PASS 1: Find all exact matches
-        // Iterate backwards because we're removing elements from pegsToMatch.
-        for index in pegs.indices.reversed() {
-
+        
+        let backwardsExactMatch = pegs.indices.reversed().map{ index in
             // Same color in the same position?
             if pegsToMatch.count > index,
                pegsToMatch[index] == pegs[index] {
-
-                // Mark as an exact match
-                results[index] = .exact
-
                 // Remove the matched peg so it can't be reused later
                 pegsToMatch.remove(at: index)
+                // Mark as an exact match
+                return Match.exact
+            } else {
+                return .nomatch
             }
         }
 
-        // PASS 2: Find inexact matches
-        // (correct color, wrong position)
-        for index in pegs.indices {
-
-            // Skip pegs already marked as exact
-            if results[index] != .exact {
-
-                // Does this peg exist somewhere in the remaining unmatched pegs?
-                if let matchIndex = pegsToMatch.firstIndex(of: pegs[index]) {
-
-                    // Mark as an inexact match
-                    results[index] = .inexact
-
-                    // Remove it so it can't match another peg later
-                    pegsToMatch.remove(at: matchIndex)
-                }
+        let exactMatches = Array(backwardsExactMatch.reversed())
+        return pegs.indices.map{ index in
+            if exactMatches[index] == .exact ,
+               let matchIndex = pegsToMatch.firstIndex(of: pegs[index]){
+                pegsToMatch.remove(at: matchIndex)
+                return .inexact
+            } else {
+                return exactMatches[index]
             }
         }
 
-        // Return the completed match results
-        return results
     }
     
     
